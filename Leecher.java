@@ -18,6 +18,7 @@ public class Leecher implements Runnable {
 
         this.soySeeder = false;
         this.server = server;
+        this.tracker = tracker;
     }
 
     public int getId() {
