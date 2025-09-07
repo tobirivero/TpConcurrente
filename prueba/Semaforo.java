@@ -1,41 +1,36 @@
 package prueba;
 
-import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.concurrent.Semaphore;
 
 public class Semaforo {
-    private ArrayList<Semaphore> semaforos;
-    // semaforos.get(4); -> semaforo proceso 4. Por convencion el ultimo semaforo es el del tracker
+    private Map<String, Semaphore> semaforos = new HashMap<>();
+    // semaforos.get("P4"); -> semaforo proceso 4.
 
-    public Semaforo(ArrayList<Semaphore> semaforos){
-        this.semaforos = semaforos;
-    }    
-    
-    public void setSemaforos(ArrayList<Semaphore> semaforos) {
-        this.semaforos = semaforos;
-    }
-
-    public ArrayList<Semaphore> getSemaforos() {
-        return semaforos;
+    public Semaforo() {
+        for (int i = 0; i < 4; i++) {
+            semaforos.put("P" + i, new Semaphore(1));
+        }
+        semaforos.put("Tracker", new Semaphore(1));
+        semaforos.put("Server", new Semaphore(1));
+        semaforos.put("Printer", new Semaphore(1));
+        semaforos.put("Registro", new Semaphore(1));
     }
 
-    public Semaphore getSemaforoById(Integer id){
-        return semaforos.get(id);
-    }
-    public Semaphore getSemaforoTracker(){
-        return semaforos.get(4);
-    }
-    public Semaphore getSemaforoServer(){
-        return semaforos.get(5);
-    }
-    public Semaphore getSemaforoPrinter(){
-        return semaforos.get(6);
-    }
-    public Semaphore getSemaforoRegistro(){
-        return semaforos.get(7);
+    private Semaphore obtenerSemaforo(String nombreDeSemaforo) {
+        Semaphore s = this.semaforos.get(nombreDeSemaforo);
+        if (s == null)
+            throw new IllegalArgumentException("Número de semáforo inválido: " + nombreDeSemaforo);
+        return s;
     }
 
-    //Capaz cambiar
+    public void upSemaforo(String nombreDeSemaforo) {
+        obtenerSemaforo(nombreDeSemaforo).release();
+    }
 
+    public void downSemaforo(String nombreDeSemaforo) {
+        obtenerSemaforo(nombreDeSemaforo).acquireUninterruptibly();
+    }
 
 }
