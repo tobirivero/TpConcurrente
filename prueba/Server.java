@@ -58,7 +58,7 @@ public class Server implements Runnable {
         while (true) {
             if (estanTodosEnRed()) {
                 System.out.println("EL SERVIDOR ENVIO EL 100%. MATANDO PROCESO SERVIDOR...");
-                break; // salimos del bucle
+                return; // salimos del bucle
             }
         }
     }

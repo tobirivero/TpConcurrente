@@ -37,13 +37,16 @@ public class Tracker implements Runnable {
             return null;
         }
 
-        this.semaforos.downSemaforo("Registro");
-        this.registroServer.addPid(key, id);
-        this.semaforos.upSemaforo("Registro");
-
         Random rand = new Random();
         Integer aleatorio = rand.nextInt(pids.size());
         return leechers.get(pids.get(aleatorio));
+    }
+
+    public void informarSoyPoseedor(Integer key, Integer pid) {
+        // leecher informa al tracker que posee un bloque
+        this.semaforos.downSemaforo("Registro");
+        this.registroServer.addPid(key, id);
+        this.semaforos.upSemaforo("Registro");
     }
 
     @Override
@@ -60,6 +63,7 @@ public class Tracker implements Runnable {
                 System.out.println();
             }
         }
+        return;
     }
 
     public void setLeechers(ArrayList<Leecher> leechers) {

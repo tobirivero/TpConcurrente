@@ -117,6 +117,7 @@ public class Leecher implements Runnable {
             } else {
                 // Tracker debe devolver el/los peers que tienen el bloque con index key
                 Leecher consultar_a = this.tracker.consultarBloque(key, this.id);
+
                 semaforos.upSemaforo("Tracker");
 
                 semaforos.downSemaforo("P" + consultar_a.getId());
@@ -127,6 +128,11 @@ public class Leecher implements Runnable {
 
                 // Actualizo mi archivo
                 this.actualizar_mi_archivo(key, contenido_bloque);
+
+                // informo al tracker que poseo un nuevo bloque
+                semaforos.downSemaforo("Tracker");
+                this.tracker.informarSoyPoseedor(key, this.id);
+                semaforos.upSemaforo("Tracker");
 
             }
         }
