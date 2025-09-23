@@ -51,6 +51,9 @@ public class Semaforos {
         //Semaforo para mostrar por consola el archivo
         Semaphore m_printer = new Semaphore(1); //i=28
 
+        //Semaforo resumen
+        Semaphore m_resume = new Semaphore(1);
+
         ArrayList < Semaphore > list = new ArrayList<>();
         list.add(l0);
         list.add(l1);
@@ -81,7 +84,7 @@ public class Semaforos {
         list.add(tq);
         list.add(tracker);
         list.add(m_printer);
-
+        list.add(m_resume);
         this.semaforos = list;
     }
 
@@ -119,5 +122,7 @@ public class Semaforos {
     public Semaphore getSemaforoPrinter(){
         return semaforos.get(28);
     }
-    
+    public Semaphore getMutexResume(){
+        return  semaforos.get(29);
+    }
 }

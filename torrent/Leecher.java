@@ -15,7 +15,8 @@ public class Leecher implements  Runnable{
     private Archivo mi_archivo;
     private Tracker tracker;
     private Server server;
-    public Leecher (Integer id, Semaforos semaforos, Archivo archivo, Tracker tracker, Server server){
+    private Resume resume;
+    public Leecher (Integer id, Semaforos semaforos, Archivo archivo, Tracker tracker, Server server, Resume resume){
         this.id = id;
         this.semaforos = semaforos;
         this.buffer_tracker = new LinkedList<>();
@@ -23,6 +24,7 @@ public class Leecher implements  Runnable{
         this.mi_archivo = archivo;
         this.tracker = tracker;
         this.server = server;
+        this.resume = resume;
     }
 
     public Bloque bloque_faltante(){
@@ -74,11 +76,12 @@ public class Leecher implements  Runnable{
         Semaphore s_server = semaforos.getSemaforoServer();
         Semaphore s_m_printer = semaforos.getSemaforoPrinter();
         Semaphore s_m_file = semaforos.getMutexArchivo(this.getId());
+        Semaphore s_m_resume = semaforos.getMutexResume();
         boolean stop = false;
         while(!stop){
             Bloque next_bloque = bloque_faltante();
             stop = (next_bloque == null);
-
+            String source_answer = "Server";
             if(!stop){
                 //Genero request de tipo 0 al tracker
                 RequestTracker request_tracker = new RequestTracker(this, 0, next_bloque.getId_bloque(),null);
@@ -115,6 +118,7 @@ public class Leecher implements  Runnable{
                     Integer id_seeder_answer = answer_tracker.getSeeder().getId();
                     Semaphore s_m_seeder_answer = semaforos.getMutexSeederX(id_seeder_answer);
 
+                    source_answer = "" + id_seeder_answer;
                     //Cargo la request en el seeder
                     s_m_seeder_answer.acquireUninterruptibly();
                     RequestBloque request_seeder = new RequestBloque(this, next_bloque.getId_bloque());
@@ -136,6 +140,14 @@ public class Leecher implements  Runnable{
                 mutex_buffer_bloques.acquireUninterruptibly();
                 while(!buffer_bloques.isEmpty()){
                     Bloque bloque = buffer_bloques.poll();
+                    //Escribo en el resumen
+                    s_m_resume.acquireUninterruptibly();
+                    resume.writeTransfer(this.id, bloque.getId_bloque(), source_answer);
+                    if(resume.isDone()){
+                        resume.saveToFile("resumen.txt");
+                    }
+                    s_m_resume.release();
+                    
                     updateArchivo(bloque);
                     new_bloques.add(bloque.getId_bloque());
                 }
