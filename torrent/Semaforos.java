@@ -8,51 +8,51 @@ public class Semaforos {
 
     public Semaforos() {
         //Asumimos 4 leechers -> 1 semaforo x c/leecher
-        Semaphore l0 = new Semaphore(0); // i=0
-        Semaphore l1 = new Semaphore(0); // i=1
-        Semaphore l2 = new Semaphore(0); // i=2
-        Semaphore l3 = new Semaphore(0); // i=3
+        Semaphore l0 = new Semaphore(0,true); // i=0
+        Semaphore l1 = new Semaphore(0,true); // i=1
+        Semaphore l2 = new Semaphore(0,true); // i=2
+        Semaphore l3 = new Semaphore(0,true); // i=3
         //Asumimos 4 seeders -> 1 semaforo x c/seeder
-        Semaphore s0 = new Semaphore(0); // i=4
-        Semaphore s1 = new Semaphore(0); // i=5
-        Semaphore s2 = new Semaphore(0); // i=6
-        Semaphore s3 = new Semaphore(0); // i=7
+        Semaphore s0 = new Semaphore(0,true); // i=4
+        Semaphore s1 = new Semaphore(0,true); // i=5
+        Semaphore s2 = new Semaphore(0,true); // i=6
+        Semaphore s3 = new Semaphore(0,true); // i=7
         
         //Seeder y Leecher comparten 1 archivo, entonces 1 mutex por el archivo
-        Semaphore m0 = new Semaphore(1); // i=8
-        Semaphore m1 = new Semaphore(1); // i=9
-        Semaphore m2 = new Semaphore(1); // i=10
-        Semaphore m3 = new Semaphore(1); // i=11
+        Semaphore m0 = new Semaphore(1,true); // i=8
+        Semaphore m1 = new Semaphore(1,true); // i=9
+        Semaphore m2 = new Semaphore(1,true); // i=10
+        Semaphore m3 = new Semaphore(1,true); // i=11
 
         //Cada seeder tiene un mutex para sus requests
-        Semaphore s0_m = new Semaphore(1); // i=12
-        Semaphore s1_m = new Semaphore(1); // i=13
-        Semaphore s2_m = new Semaphore(1); // i=14
-        Semaphore s3_m = new Semaphore(1); // i=15
+        Semaphore s0_m = new Semaphore(1,true); // i=12
+        Semaphore s1_m = new Semaphore(1,true); // i=13
+        Semaphore s2_m = new Semaphore(1,true); // i=14
+        Semaphore s3_m = new Semaphore(1,true); // i=15
         //Cada leecher tiene un mutex para su respuesta de buffer_tracker
-        Semaphore l0_bt_m = new Semaphore(1);// i=16
-        Semaphore l1_bt_m = new Semaphore(1);// i=17
-        Semaphore l2_bt_m = new Semaphore(1);// i=18
-        Semaphore l3_bt_m = new Semaphore(1);// i=19
+        Semaphore l0_bt_m = new Semaphore(1,true);// i=16
+        Semaphore l1_bt_m = new Semaphore(1,true);// i=17
+        Semaphore l2_bt_m = new Semaphore(1,true);// i=18
+        Semaphore l3_bt_m = new Semaphore(1,true);// i=19
         //Cada leecher tiene un mutex para su respuesta de buffer_bloques
-        Semaphore l0_bb_m = new Semaphore(1); //i=20
-        Semaphore l1_bb_m = new Semaphore(1); //i=21
-        Semaphore l2_bb_m = new Semaphore(1); //i=22
-        Semaphore l3_bb_m = new Semaphore(1); //i=23
+        Semaphore l0_bb_m = new Semaphore(1,true); //i=20
+        Semaphore l1_bb_m = new Semaphore(1,true); //i=21
+        Semaphore l2_bb_m = new Semaphore(1,true); //i=22
+        Semaphore l3_bb_m = new Semaphore(1,true); //i=23
 
         //Semaforo server-queue y server 
-        Semaphore sq = new Semaphore(1); // i=24
-        Semaphore server = new Semaphore(0); //i=25
+        Semaphore sq = new Semaphore(1,true); // i=24
+        Semaphore server = new Semaphore(0,true); //i=25
 
         //Semaforos tracker-queue y tracker
-        Semaphore tq = new Semaphore(1); //i=26
-        Semaphore tracker = new Semaphore(0); //i=27
+        Semaphore tq = new Semaphore(1,true); //i=26
+        Semaphore tracker = new Semaphore(0,true); //i=27
 
         //Semaforo para mostrar por consola el archivo
-        Semaphore m_printer = new Semaphore(1); //i=28
+        Semaphore m_printer = new Semaphore(1,true); //i=28
 
         //Semaforo resumen
-        Semaphore m_resume = new Semaphore(1);
+        Semaphore m_resume = new Semaphore(1,true);
 
         ArrayList < Semaphore > list = new ArrayList<>();
         list.add(l0);

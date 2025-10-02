@@ -36,9 +36,8 @@ public class Seeder implements Runnable{
     
     public Bloque returnBloque(RequestBloque request){
         Integer index_bloque = request.getIndex_bloque();
-        Integer id_peer = request.getLeecher().getId();
 
-        Semaphore mutex_archivo = semaforos.getMutexArchivo(id_peer);
+        Semaphore mutex_archivo = semaforos.getMutexArchivo(this.id);
 
         mutex_archivo.acquireUninterruptibly();
         Bloque bloque = mi_archivo.getBloque(index_bloque);

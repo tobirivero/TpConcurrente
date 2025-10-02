@@ -154,8 +154,9 @@ public class Leecher implements  Runnable{
                 mutex_buffer_bloques.release();
 
                 //Llamo al tracker a que se actualice con request de tipo 1
-                s_tracker_request.acquireUninterruptibly();
                 RequestTracker update_request = new RequestTracker(this, 1, next_bloque.getId_bloque(),new_bloques);
+                
+                s_tracker_request.acquireUninterruptibly();
                 tracker.addRequest(update_request);
                 s_tracker_request.release();
 

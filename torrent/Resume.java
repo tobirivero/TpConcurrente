@@ -34,7 +34,7 @@ public class Resume {
     public void saveToFile(String filename){
         try (FileWriter fw = new FileWriter(filename)) {
             fw.write("--- Resumen de transferencias de bloques ---\n\n");
-            fw.write("Peer X recibio del Peer Y (o server) el bloque K\n\n");
+            fw.write("Peer X recibio el bloque K del Peer Y (o server)\n\n");
             // Cabecera de bloques
             fw.write(String.format("%-10s", "Bloque"));
             for(int i=0; i<matriz.size(); i++){
