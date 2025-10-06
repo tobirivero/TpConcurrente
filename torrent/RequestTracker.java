@@ -2,9 +2,19 @@ package torrent;
 
 import java.util.List;
 
+/*
+  Es utilizada por los leechers con dos propositos:
+  1)Solicitar informacion de un bloque al tracker
+    Esta solicitud es de tipo 0, contiene el id del bloque que el leecher solicita. En este caso, bloques_to_update = NULL
+  2)Pedirle al tracker que se actualice
+    Esta solicitud es de tipo 1, contiene la lista de nuevos bloques diposnibles del peer. En este caso, index_bloque = NULL.
+
+    Ambas solicitudes contienen la referencia del leecher que crea la solicitud.
+ */
+
 public class RequestTracker {
     private Leecher leecher;
-    private Integer tipo; //Definimos tipo 0 para solicitar datos, 1 para actualizar tracker
+    private Integer tipo; 
     private Integer index_bloque;
     private List < Integer > bloques_to_update;
     

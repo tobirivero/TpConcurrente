@@ -7,121 +7,134 @@ public class Semaforos {
     private ArrayList < Semaphore > semaforos;
 
     public Semaforos() {
-        //Asumimos 4 leechers -> 1 semaforo x c/leecher
-        Semaphore l0 = new Semaphore(0,true); // i=0
-        Semaphore l1 = new Semaphore(0,true); // i=1
-        Semaphore l2 = new Semaphore(0,true); // i=2
-        Semaphore l3 = new Semaphore(0,true); // i=3
-        //Asumimos 4 seeders -> 1 semaforo x c/seeder
-        Semaphore s0 = new Semaphore(0,true); // i=4
-        Semaphore s1 = new Semaphore(0,true); // i=5
-        Semaphore s2 = new Semaphore(0,true); // i=6
-        Semaphore s3 = new Semaphore(0,true); // i=7
+        //Asumimos 4 leechers -> 1 semaforo x c/leecher (semaforo asociado al run)
+        Semaphore s_l0 = new Semaphore(0,true); // i=0
+        Semaphore s_l1 = new Semaphore(0,true); // i=1
+        Semaphore s_l2 = new Semaphore(0,true); // i=2
+        Semaphore s_l3 = new Semaphore(0,true); // i=3
+        //Asumimos 4 seeders -> 1 semaforo x c/seeder (semaforo asociado al run)
+        Semaphore s_s0 = new Semaphore(0,true); // i=4
+        Semaphore s_s1 = new Semaphore(0,true); // i=5
+        Semaphore s_s2 = new Semaphore(0,true); // i=6
+        Semaphore s_s3 = new Semaphore(0,true); // i=7
         
-        //Seeder y Leecher comparten 1 archivo, entonces 1 mutex por el archivo
-        Semaphore m0 = new Semaphore(1,true); // i=8
-        Semaphore m1 = new Semaphore(1,true); // i=9
-        Semaphore m2 = new Semaphore(1,true); // i=10
-        Semaphore m3 = new Semaphore(1,true); // i=11
+        //Seeder y Leecher comparten 1 archivo, entonces 1 mutex por el archivo compartido
+        Semaphore s_m_file0 = new Semaphore(1,true); // i=8
+        Semaphore s_m_file1 = new Semaphore(1,true); // i=9
+        Semaphore s_m_file2 = new Semaphore(1,true); // i=10
+        Semaphore s_m_file3 = new Semaphore(1,true); // i=11
 
-        //Cada seeder tiene un mutex para sus requests
-        Semaphore s0_m = new Semaphore(1,true); // i=12
-        Semaphore s1_m = new Semaphore(1,true); // i=13
-        Semaphore s2_m = new Semaphore(1,true); // i=14
-        Semaphore s3_m = new Semaphore(1,true); // i=15
-        //Cada leecher tiene un mutex para su respuesta de buffer_tracker
-        Semaphore l0_bt_m = new Semaphore(1,true);// i=16
-        Semaphore l1_bt_m = new Semaphore(1,true);// i=17
-        Semaphore l2_bt_m = new Semaphore(1,true);// i=18
-        Semaphore l3_bt_m = new Semaphore(1,true);// i=19
-        //Cada leecher tiene un mutex para su respuesta de buffer_bloques
-        Semaphore l0_bb_m = new Semaphore(1,true); //i=20
-        Semaphore l1_bb_m = new Semaphore(1,true); //i=21
-        Semaphore l2_bb_m = new Semaphore(1,true); //i=22
-        Semaphore l3_bb_m = new Semaphore(1,true); //i=23
+        //Cada seeder tiene un mutex para su cola de requests
+        Semaphore s_m_s0 = new Semaphore(1,true); // i=12
+        Semaphore s_m_s1 = new Semaphore(1,true); // i=13
+        Semaphore s_m_s2 = new Semaphore(1,true); // i=14
+        Semaphore s_m_s3 = new Semaphore(1,true); // i=15
+        //Cada leecher tiene un mutex para su cola de buffer_tracker
+        Semaphore s_m_buffer_tracker_l0 = new Semaphore(1,true);// i=16
+        Semaphore s_m_buffer_tracker_l1 = new Semaphore(1,true);// i=17
+        Semaphore s_m_buffer_tracker_l2 = new Semaphore(1,true);// i=18
+        Semaphore s_m_buffer_tracker_l3 = new Semaphore(1,true);// i=19
+        //Cada leecher tiene un mutex para su cola de buffer_bloques
+        Semaphore s_m_buffer_bloques_l0 = new Semaphore(1,true); //i=20
+        Semaphore s_m_buffer_bloques_l1 = new Semaphore(1,true); //i=21
+        Semaphore s_m_buffer_bloques_l2 = new Semaphore(1,true); //i=22
+        Semaphore s_m_buffer_bloques_l3 = new Semaphore(1,true); //i=23
 
-        //Semaforo server-queue y server 
-        Semaphore sq = new Semaphore(1,true); // i=24
-        Semaphore server = new Semaphore(0,true); //i=25
+        //El servidor posee un mutex para su cola de solicitudes 
+        Semaphore s_m_server = new Semaphore(1,true); // i=24
+        //El servidor posee un semaforo asociado a su run
+        Semaphore s_server = new Semaphore(0,true); //i=25
 
-        //Semaforos tracker-queue y tracker
-        Semaphore tq = new Semaphore(1,true); //i=26
-        Semaphore tracker = new Semaphore(0,true); //i=27
+        //El tracker posee un mutex para su cola de solicitudes 
+        Semaphore s_m_tracker = new Semaphore(1,true); //i=26
+        //El tracker posee un semaforo asociado a su run
+        Semaphore s_tracker = new Semaphore(0,true); //i=27
 
-        //Semaforo para mostrar por consola el archivo
-        Semaphore m_printer = new Semaphore(1,true); //i=28
+        //Semaforo mutex para escribir por la consola
+        Semaphore s_m_printer = new Semaphore(1,true); //i=28
 
-        //Semaforo resumen
-        Semaphore m_resume = new Semaphore(1,true);
+        //Semaforo mutex para escribir por el resumen
+        Semaphore s_m_resume = new Semaphore(1,true);
 
         ArrayList < Semaphore > list = new ArrayList<>();
-        list.add(l0);
-        list.add(l1);
-        list.add(l2);
-        list.add(l3);
-        list.add(s0);
-        list.add(s1);
-        list.add(s2);
-        list.add(s3);
-        list.add(m0);
-        list.add(m1);
-        list.add(m2);
-        list.add(m3);
-        list.add(s0_m);
-        list.add(s1_m);
-        list.add(s2_m);
-        list.add(s3_m);
-        list.add(l0_bt_m);
-        list.add(l1_bt_m);
-        list.add(l2_bt_m);
-        list.add(l3_bt_m);
-        list.add(l0_bb_m);
-        list.add(l1_bb_m);
-        list.add(l2_bb_m);
-        list.add(l3_bb_m);
-        list.add(sq);
-        list.add(server);
-        list.add(tq);
-        list.add(tracker);
-        list.add(m_printer);
-        list.add(m_resume);
+        list.add(s_l0);
+        list.add(s_l1);
+        list.add(s_l2);
+        list.add(s_l3);
+        list.add(s_s0);
+        list.add(s_s1);
+        list.add(s_s2);
+        list.add(s_s3);
+        list.add(s_m_file0);
+        list.add(s_m_file1);
+        list.add(s_m_file2);
+        list.add(s_m_file3);
+        list.add(s_m_s0);
+        list.add(s_m_s1);
+        list.add(s_m_s2);
+        list.add(s_m_s3);
+        list.add(s_m_buffer_tracker_l0);
+        list.add(s_m_buffer_tracker_l1);
+        list.add(s_m_buffer_tracker_l2);
+        list.add(s_m_buffer_tracker_l3);
+        list.add(s_m_buffer_bloques_l0);
+        list.add(s_m_buffer_bloques_l1);
+        list.add(s_m_buffer_bloques_l2);
+        list.add(s_m_buffer_bloques_l3);
+        list.add(s_m_server);
+        list.add(s_server);
+        list.add(s_m_tracker);
+        list.add(s_tracker);
+        list.add(s_m_printer);
+        list.add(s_m_resume);
         this.semaforos = list;
     }
 
+    //Devuelve el semaforo asociado al run del leecher x
     public Semaphore getSemaforoLeecherX(int index){
         return semaforos.get(index);
     }
+    //Devuelve el semaforo asociado al run del seeder x
     public Semaphore getSemaforoSeederX(int index){
         return semaforos.get(4+index);
     }
+    //Devuelve el semaforo mutex del archivo compartido por el peer con id=index
     public Semaphore getMutexArchivo(int index){
         return semaforos.get(8 + index);
     }
+    //Devuelve el semaforo asociado al mutex del buffer de solicitudes del seeder x
     public Semaphore getMutexSeederX(int index){
         return semaforos.get(12 + index);
     }
+    //Devuelve el semaforo asociado al mutex del buffer tracker del leecher x
     public Semaphore getMutexBtLeecherX(int index){
         return semaforos.get(16 + index);
     }
+    //Devuelve el semaforo asociado al mutex del buffer bloques del leecher x
     public Semaphore getMutexBbLeecherX(int index){
         return semaforos.get(20 + index);
     }
-    
+    //Devuelve el semaforo mutex asociado al buffer de solicitudes del server
     public Semaphore getSemaforoServerRequest(){
         return semaforos.get(24);
     }
+    //Devuelve el semaforo asociado al run del server
     public Semaphore getSemaforoServer(){
         return semaforos.get(25);
     }
+    //Devuelve el semaforo mutex asociado al buffer de solicitudes del tracker 
     public Semaphore getSemaforoTrackerRequest(){
         return semaforos.get(26);
     }
+    //Devuelve el semaforo asociado al run del tracker
     public Semaphore getSemaforoTracker(){
         return semaforos.get(27);
     }
+    //Devuelve el semaforo mutex asociado al printer
     public Semaphore getSemaforoPrinter(){
         return semaforos.get(28);
     }
+    //Devuelve el semaforo mutex asociado al resumen
     public Semaphore getMutexResume(){
         return  semaforos.get(29);
     }

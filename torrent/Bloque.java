@@ -1,5 +1,9 @@
 package torrent;
 
+/*
+  Un bloque esta definido por el par {id_bloque, contenido}
+ */
+
 public class Bloque {
     private Integer id_bloque;
     private String content;

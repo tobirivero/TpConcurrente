@@ -4,6 +4,16 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 
+/*
+ Es una lista de bloques. Es compartido por el leecher y seeder del mismo peer.
+ Provee los metodos:
+ -getBloque(index) -> devuelve el bloque en el indice = index
+ -writeBloque(bloque) -> sobreescribe el bloque en el archivo (en primera instancia esta vacio)
+ -faltantes() -> devuelve una lista de los bloques faltantes del archivo
+ -printFile(peer_id, ,semaforo_printer)  -> Informa que muere el peer con peer_id y printea en la consola el archivo final.
+    Utiliza el semaoforo mutex del printer para que en la consola un solo proceso escriba a la vez.
+ */
+
 public class Archivo {
     private ArrayList < Bloque > mi_archivo;
 
