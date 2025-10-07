@@ -27,14 +27,13 @@ public class Leecher implements  Runnable{
         this.resume = resume;
     }
 
-    public Bloque bloque_faltante(){
+    public Bloque bloque_faltante(Semaphore s_m_file){
         /*
-            Devuelve de forma aleatoria un bloque faltante del archivo (null si el archivo esta completo). 
+            Devuelve de forma aleatoria un bloque faltante del archivo (null si el archivo esta completo).
+            Recibe el mutex asociado al archivo compartido del peer. Decidimos que reciba el semaforo como parametro y 
+            ejecute el acquired dentro del metodo para que tome el recurso, y ejecute la menor cantidad de instrucciones posibles. 
             Utiliza el semaforo mutex asociado al archivo del peer para acceder a la seccion critica, luego libera el recurso.
          */
-
-
-        Semaphore s_m_file = semaforos.getMutexArchivo(id);
         
         s_m_file.acquireUninterruptibly();
         List < Bloque > faltantes = mi_archivo.faltantes();
@@ -50,14 +49,13 @@ public class Leecher implements  Runnable{
         return faltantes.get(indice);
     }
 
-    public void updateArchivo(Bloque bloque){
+    public void updateArchivo(Bloque bloque, Semaphore s_m_file){
         /*
           Actualiza el bloque del archivo (sobreescribe el bloque vacio). Llama al metodo writeBloque de la instancia del archivo.
+          Misma justificacion de porque recibe el semaforo como parametro que en bloque_faltante(...)
            Utiliza el semaforo mutex asociado al archivo del peer para acceder a la seccion critica, luego libera el recurso.
          */
 
-        Semaphore s_m_file = semaforos.getMutexArchivo(this.id);
-        
         s_m_file.acquireUninterruptibly();
         mi_archivo.writeBloque(bloque);
         s_m_file.release();
@@ -104,7 +102,7 @@ public class Leecher implements  Runnable{
 
         while(!stop){
 
-            Bloque next_bloque = bloque_faltante();
+            Bloque next_bloque = bloque_faltante(s_m_file);
             stop = (next_bloque == null);
             String source_answer = "Server";
 
@@ -194,7 +192,7 @@ public class Leecher implements  Runnable{
                 while(!buffer_bloques.isEmpty()){
                     Bloque bloque = buffer_bloques.poll();
 
-                    updateArchivo(bloque);
+                    updateArchivo(bloque,s_m_file);
                     new_bloques.add(bloque.getId_bloque());
 
                     s_m_buffer_bloques.release();

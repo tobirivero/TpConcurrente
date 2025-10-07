@@ -66,7 +66,7 @@ public class Server implements  Runnable{
         Semaphore s_server = semaforos.getSemaforoServer();
         Semaphore s_m_server = semaforos.getSemaforoServerRequest();
         Semaphore s_m_printer = semaforos.getSemaforoPrinter();
-
+        Semaphore s_m_server_kill = semaforos.getMutexKillServer();
         //Flag booleana que pone fin al run
         boolean stop = this.signal_to_kill;
 
@@ -76,9 +76,9 @@ public class Server implements  Runnable{
             s_server.acquireUninterruptibly();
 
             //Accedo a la region critica para verificar la flag de signal_to_kill por si fue puesta en true por el tracker.
-            s_m_server.acquireUninterruptibly();
+            s_m_server_kill.acquireUninterruptibly();
             stop = this.signal_to_kill;
-            s_m_server.release();
+            s_m_server_kill.release();
 
             if(stop){
                 /*El prroceso servidor fue levantado para finalizar su ejecucion por el tracker.

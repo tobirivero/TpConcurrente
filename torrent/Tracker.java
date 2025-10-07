@@ -84,7 +84,7 @@ public class Tracker implements  Runnable{
         Semaphore s_server = semaforos.getSemaforoServer();
         Semaphore s_m_server = semaforos.getSemaforoServerRequest();
         Semaphore s_m_printer = semaforos.getSemaforoPrinter();
-        
+        Semaphore s_m_server_kill = semaforos.getMutexKillServer();
         //Flag booleana que pone fin al run, es true cuando se detecta que el registro esta completo.
         boolean stop = false;
 
@@ -144,10 +144,10 @@ public class Tracker implements  Runnable{
                     System.out.println("Proceso tracker muriendo...");
                     s_m_printer.release();
 
-                    //Accedo a la region critica del mutex del servidor, y llamo al metodo kill server
-                    s_m_server.acquireUninterruptibly();
+                    //Accedo a la region critica de la flag kill del servidor, y llamo al metodo killServer
+                    s_m_server_kill.acquireUninterruptibly();
                     server.killServer();
-                    s_m_server.release();
+                    s_m_server_kill.release();
 
                     //Levanto al servidor para que termine su ejecucion
                     s_server.release();
@@ -156,11 +156,11 @@ public class Tracker implements  Runnable{
                     //Para cada seeder llamo al metodo killSeeder, accediendo a la region critica del seeder
                     for(int i=0 ; i<seeders.size() ; i++){
                         Seeder seeder_i = seeders.get(i);
-                        Semaphore s_m_seeder = semaforos.getMutexSeederX(i);
+                        Semaphore s_m_seeder_kill = semaforos.getMutexKillSeederX(i);
 
-                        s_m_seeder.acquireUninterruptibly();
+                        s_m_seeder_kill.acquireUninterruptibly();
                         seeder_i.killSeeder();
-                        s_m_seeder.release();
+                        s_m_seeder_kill.release();
                     }
 
                     //Levanto seeders, por si alguno quedo bloqueado

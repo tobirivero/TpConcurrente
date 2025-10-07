@@ -40,22 +40,34 @@ public class Semaforos {
         Semaphore s_m_buffer_bloques_l2 = new Semaphore(1,true); //i=22
         Semaphore s_m_buffer_bloques_l3 = new Semaphore(1,true); //i=23
 
+        
+        //Semaforo mutex para la flag kill de c/seeder 
+        Semaphore s_m_seeder0_kill = new Semaphore(1,true); //i=24
+        Semaphore s_m_seeder1_kill = new Semaphore(1,true); //i=25
+        Semaphore s_m_seeder2_kill = new Semaphore(1,true); //i=26
+        Semaphore s_m_seeder3_kill = new Semaphore(1,true); //i=27
+
         //El servidor posee un mutex para su cola de solicitudes 
-        Semaphore s_m_server = new Semaphore(1,true); // i=24
+        Semaphore s_m_server = new Semaphore(1,true); // i=28
         //El servidor posee un semaforo asociado a su run
-        Semaphore s_server = new Semaphore(0,true); //i=25
+        Semaphore s_server = new Semaphore(0,true); //i=29
+        //Semaforo mutex para la flag kill del server
+        Semaphore s_m_server_kill = new Semaphore(1,true); //i=30
 
         //El tracker posee un mutex para su cola de solicitudes 
-        Semaphore s_m_tracker = new Semaphore(1,true); //i=26
+        Semaphore s_m_tracker = new Semaphore(1,true); //i=31
         //El tracker posee un semaforo asociado a su run
-        Semaphore s_tracker = new Semaphore(0,true); //i=27
+        Semaphore s_tracker = new Semaphore(0,true); //i=32
 
         //Semaforo mutex para escribir por la consola
-        Semaphore s_m_printer = new Semaphore(1,true); //i=28
+        Semaphore s_m_printer = new Semaphore(1,true); //i=33
 
         //Semaforo mutex para escribir por el resumen
-        Semaphore s_m_resume = new Semaphore(1,true);
+        Semaphore s_m_resume = new Semaphore(1,true); //i=34
 
+        
+        
+        
         ArrayList < Semaphore > list = new ArrayList<>();
         list.add(s_l0);
         list.add(s_l1);
@@ -81,8 +93,13 @@ public class Semaforos {
         list.add(s_m_buffer_bloques_l1);
         list.add(s_m_buffer_bloques_l2);
         list.add(s_m_buffer_bloques_l3);
+        list.add(s_m_seeder0_kill);
+        list.add(s_m_seeder1_kill);
+        list.add(s_m_seeder2_kill);
+        list.add(s_m_seeder3_kill);
         list.add(s_m_server);
         list.add(s_server);
+        list.add(s_m_server_kill);
         list.add(s_m_tracker);
         list.add(s_tracker);
         list.add(s_m_printer);
@@ -114,28 +131,36 @@ public class Semaforos {
     public Semaphore getMutexBbLeecherX(int index){
         return semaforos.get(20 + index);
     }
+    //Devuelve el semaforo mutex asociado a la flag kill de c/seeder
+    public Semaphore getMutexKillSeederX(int index){
+        return semaforos.get(24+index);
+    }
     //Devuelve el semaforo mutex asociado al buffer de solicitudes del server
     public Semaphore getSemaforoServerRequest(){
-        return semaforos.get(24);
+        return semaforos.get(28);
     }
     //Devuelve el semaforo asociado al run del server
     public Semaphore getSemaforoServer(){
-        return semaforos.get(25);
+        return semaforos.get(29);
+    }
+    //Devuelve el semaforo mutex asociado a la flag kill del server
+    public Semaphore getMutexKillServer(){
+        return semaforos.get(30);
     }
     //Devuelve el semaforo mutex asociado al buffer de solicitudes del tracker 
     public Semaphore getSemaforoTrackerRequest(){
-        return semaforos.get(26);
+        return semaforos.get(31);
     }
     //Devuelve el semaforo asociado al run del tracker
     public Semaphore getSemaforoTracker(){
-        return semaforos.get(27);
+        return semaforos.get(32);
     }
     //Devuelve el semaforo mutex asociado al printer
     public Semaphore getSemaforoPrinter(){
-        return semaforos.get(28);
+        return semaforos.get(33);
     }
     //Devuelve el semaforo mutex asociado al resumen
     public Semaphore getMutexResume(){
-        return  semaforos.get(29);
+        return  semaforos.get(34);
     }
 }

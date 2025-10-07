@@ -40,14 +40,14 @@ public class Seeder implements Runnable{
         return id;
     }
     
-    public Bloque returnBloque(RequestBloque request){
+    public Bloque returnBloque(RequestBloque request, Semaphore s_m_file){
         /*
-            Devuelve el bloque solicitado en la request. 
+            Devuelve el bloque solicitado en la request. Recibe el mutex asociado al archivo compartido del peer.
+            Decidimos que reciba el semaforo como parametro y ejecute el acquired dentro del metodo para que tome el recurso,
+            y ejecute la menor cantidad de instrucciones posibles. 
             El seeder accede al bloque del archivo del peer mediante el semaforo mutex asociado, luego libera el recurso.
          */
         Integer index_bloque = request.getIndex_bloque();
-
-        Semaphore s_m_file = semaforos.getMutexArchivo(this.id);
 
         s_m_file.acquireUninterruptibly();
         Bloque bloque = mi_archivo.getBloque(index_bloque);
@@ -70,7 +70,8 @@ public class Seeder implements Runnable{
         Semaphore s_seeder = semaforos.getSemaforoSeederX(id);
         Semaphore s_m_seeder = semaforos.getMutexSeederX(id);
         Semaphore s_m_printer = semaforos.getSemaforoPrinter();
-
+        Semaphore s_m_seeder_kill = semaforos.getMutexKillSeederX(id);
+        Semaphore s_m_file = semaforos.getMutexArchivo(id);
         //Flag booleana que pone fin al run
         boolean stop = this.signal_to_kill;
         while(!stop){
@@ -79,9 +80,9 @@ public class Seeder implements Runnable{
             s_seeder.acquireUninterruptibly();
 
             //Accedo a la region critica para verificar la flag de signal_to_kill por si fue puesta en true por el tracker.
-            s_m_seeder.acquireUninterruptibly();
+            s_m_seeder_kill.acquireUninterruptibly();
             stop = this.signal_to_kill;
-            s_m_seeder.release();
+            s_m_seeder_kill.release();
 
             if(stop){
                 /*El proceso seeder fue levantado para finalizar su ejecucion por el tracker.
@@ -104,7 +105,7 @@ public class Seeder implements Runnable{
                     Integer id_leecher = leecher.getId();
 
                     //Llamo al metodo returnBloque con la request, devuelve el bloque solicitado
-                    Bloque bloque_answer = returnBloque(request);
+                    Bloque bloque_answer = returnBloque(request,s_m_file);
 
                     //Obtengo el semaforo mutex asociado al buffer de respuestas de bloques del leecher
                     Semaphore s_m_leecher = semaforos.getMutexBbLeecherX(id_leecher);
