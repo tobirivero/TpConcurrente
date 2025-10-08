@@ -1,0 +1,20 @@
+--- Resumen de transferencias de bloques ---
+
+Peer X recibio el bloque K del Peer Y (o server)
+
+Bloque    Peer 0         Peer 1         Peer 2         Peer 3         
+0         1              2              Server         2              
+1         1              Server         3              1              
+2         Server         0              3              0              
+3         3              2              Server         1              
+4         2              Server         1              2              
+5         1              Server         1              0              
+6         Server         0              0              2              
+7         2              3              Server         2              
+8         3              3              0              Server         
+9         3              0              Server         2              
+10        3              0              0              Server         
+11        3              0              0              Server         
+12        3              2              3              Server         
+13        Server         0              3              0              
+14        1              Server         0              1              
