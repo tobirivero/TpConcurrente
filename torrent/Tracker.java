@@ -82,9 +82,9 @@ public class Tracker implements  Runnable{
         Semaphore s_tracker = semaforos.getSemaforoTracker();
         Semaphore s_m_tracker = semaforos.getSemaforoTrackerRequest();
         Semaphore s_server = semaforos.getSemaforoServer();
-        Semaphore s_m_server = semaforos.getSemaforoServerRequest();
         Semaphore s_m_printer = semaforos.getSemaforoPrinter();
         Semaphore s_m_server_kill = semaforos.getMutexKillServer();
+
         //Flag booleana que pone fin al run, es true cuando se detecta que el registro esta completo.
         boolean stop = false;
 
@@ -103,6 +103,7 @@ public class Tracker implements  Runnable{
                 //La request es de tipo 0, es decir, el leecher solicita informacion sobre un bloque
 
                 // Obtengo el id del bloque se solicita, y el id del leecher que origino la request
+                Leecher leecher = request.getLeecher();
                 Integer target_index = request.getIndex_bloque();
                 Integer id_leecher = request.getLeecher().getId();
     
@@ -121,7 +122,7 @@ public class Tracker implements  Runnable{
 
                 //Accedo a la region critica y cargo la respuesta
                 s_m_leecher.acquireUninterruptibly();
-                request.getLeecher().addAnswerTracker(answer_tracker);
+                leecher.addAnswerTracker(answer_tracker);
                 s_m_leecher.release();
                 
                 //Levanto al leecher
@@ -139,11 +140,6 @@ public class Tracker implements  Runnable{
                 if(stop){
                     //El registro del tracker esta completo, debo ponerle fin a la ejecucion del servidor y los seeders
 
-                    //Accedo a la region critica de la consola, e informo que el proceso tracker se esta por hacer kill
-                    s_m_printer.acquireUninterruptibly();
-                    System.out.println("Proceso tracker muriendo...");
-                    s_m_printer.release();
-
                     //Accedo a la region critica de la flag kill del servidor, y llamo al metodo killServer
                     s_m_server_kill.acquireUninterruptibly();
                     server.killServer();
@@ -153,9 +149,9 @@ public class Tracker implements  Runnable{
                     s_server.release();
 
 
-                    //Para cada seeder llamo al metodo killSeeder, accediendo a la region critica del seeder
+                    //Para cada seeder llamo al metodo killSeeder, accediendo a la region critica de la flag del seeder
                     for(int i=0 ; i<seeders.size() ; i++){
-                        Seeder seeder_i = seeders.get(i);
+                        Seeder seeder_i = getSeederById(i);
                         Semaphore s_m_seeder_kill = semaforos.getMutexKillSeederX(i);
 
                         s_m_seeder_kill.acquireUninterruptibly();
@@ -165,13 +161,18 @@ public class Tracker implements  Runnable{
 
                     //Levanto seeders, por si alguno quedo bloqueado
                     for(int i=0 ; i<4 ; i++){
-                        Seeder seeder_i = seeders.get(i);
-                        semaforos.getSemaforoSeederX(seeder_i.getId()).release();
+                        semaforos.getSemaforoSeederX(i).release();
                     }
                     //Levanto leechers, por si alguno quedo bloqueado
                     for(int i=0 ; i<4; i++){
                         semaforos.getSemaforoLeecherX(i).release();
                     }
+
+                    //Accedo a la region critica de la consola, e informo que el proceso tracker se esta por hacer kill
+                    s_m_printer.acquireUninterruptibly();
+                    System.out.println("Proceso tracker muriendo...");
+                    s_m_printer.release();
+
                 }
 
                 

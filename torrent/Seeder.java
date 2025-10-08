@@ -44,8 +44,7 @@ public class Seeder implements Runnable{
         /*
             Devuelve el bloque solicitado en la request. Recibe el mutex asociado al archivo compartido del peer.
             Decidimos que reciba el semaforo como parametro y ejecute el acquired dentro del metodo para que tome el recurso,
-            y ejecute la menor cantidad de instrucciones posibles. 
-            El seeder accede al bloque del archivo del peer mediante el semaforo mutex asociado, luego libera el recurso.
+            y ejecute la menor cantidad de instrucciones posibles. Luego libera el recurso.
          */
         Integer index_bloque = request.getIndex_bloque();
 
@@ -72,8 +71,10 @@ public class Seeder implements Runnable{
         Semaphore s_m_printer = semaforos.getSemaforoPrinter();
         Semaphore s_m_seeder_kill = semaforos.getMutexKillSeederX(id);
         Semaphore s_m_file = semaforos.getMutexArchivo(id);
+        
         //Flag booleana que pone fin al run
         boolean stop = this.signal_to_kill;
+
         while(!stop){
             /*En primera instancia, si no hay ninguna solicitud el proceso quedara bloqueado. 
             Cuando algun leecher envie una solicitud o el tracker pone en true signal_to_kill, levantara al seeder*/

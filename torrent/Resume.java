@@ -8,7 +8,7 @@ import java.util.ArrayList;
   Esta clase esta destinada para recolectar la informacion relevante de la ejecucion. Es decir, 
   las transferencias de bloques entre leechers y seeders, y leechers y server.
 
-  Define una matriz que se indexa como peer -> bloque, y contiene como valor el id del peer (o server) que le transfirio dicho bloque.
+  Define una matriz que se indexa como peer -> bloque, y contiene como valor el id del peer de la red (o server) que le transfirio dicho bloque.
   Provee los metodos:
   -writeTransfer(peer_id, index_bloque, source) -> escribe que el peer_id recibio el bloque index_bloque del peer con id "source"
   -isDone() -> booleana, que devuelve true si todos los peers poseen todos los bloques. False en caso contrario.

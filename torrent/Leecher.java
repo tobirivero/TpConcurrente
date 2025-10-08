@@ -32,7 +32,7 @@ public class Leecher implements  Runnable{
             Devuelve de forma aleatoria un bloque faltante del archivo (null si el archivo esta completo).
             Recibe el mutex asociado al archivo compartido del peer. Decidimos que reciba el semaforo como parametro y 
             ejecute el acquired dentro del metodo para que tome el recurso, y ejecute la menor cantidad de instrucciones posibles. 
-            Utiliza el semaforo mutex asociado al archivo del peer para acceder a la seccion critica, luego libera el recurso.
+            Luego libera el recurso.
          */
         
         s_m_file.acquireUninterruptibly();
@@ -51,9 +51,9 @@ public class Leecher implements  Runnable{
 
     public void updateArchivo(Bloque bloque, Semaphore s_m_file){
         /*
-          Actualiza el bloque del archivo (sobreescribe el bloque vacio). Llama al metodo writeBloque de la instancia del archivo.
-          Misma justificacion de porque recibe el semaforo como parametro que en bloque_faltante(...)
-           Utiliza el semaforo mutex asociado al archivo del peer para acceder a la seccion critica, luego libera el recurso.
+          Escribe el bloque (sobreescribe el bloque vacio) y actualiza el archivo. Llama al metodo writeBloque de la instancia del archivo.
+          Misma justificacion de porque recibe el semaforo como parametro que en bloque_faltante()
+            Utiliza el semaforo mutex asociado al archivo del peer para acceder a la seccion critica, luego libera el recurso.
          */
 
         s_m_file.acquireUninterruptibly();
@@ -76,16 +76,17 @@ public class Leecher implements  Runnable{
 
     public void addAnswerBlock(Bloque bloque){
         /*
-         Utilizado por el proceso server o seeder. Escribe la respuesta de bloque el buffer_bloques.
+         Utilizado por el proceso server o seeder. Escribe la respuesta de bloque en el buffer_bloques.
          Se accede como region critica (desde el server o seeder).
          */
+
         this.buffer_bloques.add(bloque);
     }
 
     @Override
     public void run(){
         //Obtengo las instancias de los semaforos a utilizar, llamando a los metodos de la clase semaforos
-        Semaphore s_leecher = semaforos.getSemaforoLeecherX(this.getId());
+        Semaphore s_leecher = semaforos.getSemaforoLeecherX(this.id);
         Semaphore s_m_buffer_bloques = semaforos.getMutexBbLeecherX(this.id);
         Semaphore s_m_buffer_tracker = semaforos.getMutexBtLeecherX(this.id);
         Semaphore s_m_tracker = semaforos.getSemaforoTrackerRequest();
@@ -93,7 +94,7 @@ public class Leecher implements  Runnable{
         Semaphore s_m_server = semaforos.getSemaforoServerRequest(); 
         Semaphore s_server = semaforos.getSemaforoServer();
         Semaphore s_m_printer = semaforos.getSemaforoPrinter();
-        Semaphore s_m_file = semaforos.getMutexArchivo(this.getId());
+        Semaphore s_m_file = semaforos.getMutexArchivo(this.id);
         Semaphore s_m_resume = semaforos.getMutexResume();
 
         //Flag booleana que pone fin al run, es true cuando no hay mas bloques faltantes
@@ -130,7 +131,7 @@ public class Leecher implements  Runnable{
                 if(answer_tracker != null && answer_tracker.getAnswerStatus().equals(-1)){
                     //Como la status de la respuesta es -1, no hay seeders en la red que posean el bloque 
                      
-                    //Genero request de bloque al server
+                    //Genero request de bloque para el server
                     RequestBloque request_server = new RequestBloque(this, next_bloque.getId_bloque());
 
                     //Accedo a la region critica del buffer de solicitudes del server y cargo la request.
@@ -154,19 +155,19 @@ public class Leecher implements  Runnable{
 
                     Seeder seeder_answer = answer_tracker.getSeeder();
                     Integer id_seeder_answer = answer_tracker.getSeeder().getId();
-                    Semaphore s_m_seeder_answer = semaforos.getMutexSeederX(id_seeder_answer);
+                    Semaphore s_m_seeder = semaforos.getMutexSeederX(id_seeder_answer);
 
                     //String del id del seeder
                     source_answer = "" + id_seeder_answer; 
 
 
-                    //Genero request de bloque al seeder
+                    //Genero request de bloque para el seeder
                     RequestBloque request_seeder = new RequestBloque(this, next_bloque.getId_bloque());
                     
                     //Accedo a la region critica del buffer de solicitudes del seeder y cargo la request.
-                    s_m_seeder_answer.acquireUninterruptibly();
+                    s_m_seeder.acquireUninterruptibly();
                     seeder_answer.addRequest(request_seeder);
-                    s_m_seeder_answer.release();
+                    s_m_seeder.release();
 
                     //Obtengo el semaforo asociado al run del seeder
                     Semaphore s_seeder = semaforos.getSemaforoSeederX(id_seeder_answer);
@@ -179,7 +180,7 @@ public class Leecher implements  Runnable{
                 }
 
                 /*
-                Entre la linea , ocurre:
+                Entre la linea 190 y 210 , ocurre:
                     1) Me hago de la region critica de mi buffer de respuestas de bloques
                     2) Iterio y vacio dicho buffer, almacenando los nuevos bloques en una lista
                     3) En cada iteracion escribo en el resumen mediante el metodo writeTransfer() y actualizo mi archivo,
@@ -190,12 +191,14 @@ public class Leecher implements  Runnable{
                 
                 s_m_buffer_bloques.acquireUninterruptibly();
                 while(!buffer_bloques.isEmpty()){
-                    Bloque bloque = buffer_bloques.poll();
 
+                    Bloque bloque = buffer_bloques.poll();
+                    s_m_buffer_bloques.release();
+                    
                     updateArchivo(bloque,s_m_file);
                     new_bloques.add(bloque.getId_bloque());
 
-                    s_m_buffer_bloques.release();
+                    
 
                     s_m_resume.acquireUninterruptibly();
                     resume.writeTransfer(this.id, bloque.getId_bloque(), source_answer);

@@ -11,7 +11,7 @@ import java.util.concurrent.Semaphore;
  -writeBloque(bloque) -> sobreescribe el bloque en el archivo (en primera instancia esta vacio)
  -faltantes() -> devuelve una lista de los bloques faltantes del archivo
  -printFile(peer_id, ,semaforo_printer)  -> Informa que muere el peer con peer_id y printea en la consola el archivo final.
-    Utiliza el semaoforo mutex del printer para que en la consola un solo proceso escriba a la vez.
+    Utiliza el semaforo mutex del printer para que en la consola escriba un solo proceso  a la vez.
  */
 
 public class Archivo {

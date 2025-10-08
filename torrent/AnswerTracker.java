@@ -5,6 +5,7 @@ package torrent;
   Si answer_status es -1 -> no hay seeder en la red que contenga el bloque solicitado. Por lo que answer_seeder es NULL.
   Caso contrario, answer_status = id_seeder y answer_seeder = referencia del seeder.
  */
+
 public class AnswerTracker {
     Integer answer_status;
     Seeder answer_seeder;
